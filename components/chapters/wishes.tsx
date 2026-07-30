@@ -92,7 +92,7 @@ export function Wishes({ onCue }: { onCue?: (kind: 'tick') => void }) {
     <section
       id="wishes"
       ref={ref}
-      className={`scene ${compact ? 'min-h-[100svh] py-12' : 'h-[280vh]'}`}
+      className={`scene ${compact ? 'min-h-[100svh] py-6' : 'h-[280vh]'}`}
       style={
         {
           '--static-p': 0.9,
@@ -101,26 +101,26 @@ export function Wishes({ onCue }: { onCue?: (kind: 'tick') => void }) {
       }
       aria-label="Chapter six — leave a wish"
     >
-      <div className="scene-pin">
-        <div className="scene-stage flex flex-col md:flex-row md:items-center">
+      <div className={compact ? 'relative h-auto w-full' : 'scene-pin'}>
+        <div className={compact ? 'relative flex flex-col w-full pt-16 pb-8' : 'scene-stage flex flex-col md:flex-row md:items-center'}>
           <p className="label absolute left-6 top-6 z-20 md:left-12 md:top-10">
             Chapter 06 — Wishes
           </p>
 
           {/* left: the form */}
-          <div className="relative z-20 w-full px-6 pt-24 md:w-[42%] md:px-12 md:pt-0">
+          <div className="relative z-20 w-full px-6 pt-4 md:w-[42%] md:px-12 md:pt-0">
             <h2
               className="display text-ink"
               style={{
                 fontSize: 'clamp(2.6rem, 6.6vw, 5.6rem)',
-                clipPath: `inset(0 calc((1 - ${seg(0, 0.2)}) * 100%) 0 0)`,
+                clipPath: compact ? undefined : `inset(0 calc((1 - ${seg(0, 0.2)}) * 100%) 0 0)`,
               }}
             >
               Leave
               <br />A Wish
             </h2>
 
-            <form onSubmit={add} className="mt-8 flex items-end gap-3" style={{ opacity: seg(0.08, 0.3) }}>
+            <form onSubmit={add} className="mt-8 flex items-end gap-3" style={{ opacity: compact ? 1 : seg(0.08, 0.3) }}>
               <label className="flex-1">
                 <span className="sr-only">Your wish for Hrushikesh</span>
                 <input
@@ -162,7 +162,7 @@ export function Wishes({ onCue }: { onCue?: (kind: 'tick') => void }) {
           </div>
 
           {/* right: the constellation */}
-          <div className="relative min-h-0 flex-1 px-6 pb-20 pt-8 md:px-0 md:pb-0 md:pt-0">
+          <div className="relative min-h-0 flex-1 px-6 pb-8 pt-6 md:px-0 md:pb-0 md:pt-0">
             <svg
               viewBox={`0 0 ${VB.w} ${VB.h}`}
               className="h-full max-h-[52vh] w-full md:max-h-[86vh]"
@@ -186,9 +186,11 @@ export function Wishes({ onCue }: { onCue?: (kind: 'tick') => void }) {
                     opacity="0.75"
                     pathLength={1}
                     strokeDasharray={1}
-                    className={isFresh ? 'anim-draw' : undefined}
+                    className={isFresh && !compact ? 'anim-draw' : undefined}
                     style={
-                      isFresh
+                      compact
+                        ? { strokeDashoffset: 0 }
+                        : isFresh
                         ? ({ '--len': 1, '--dur': '900ms' } as CSSProperties)
                         : { strokeDashoffset: `calc(1 - ${seg(from, from + 0.12)})` }
                     }
@@ -200,7 +202,7 @@ export function Wishes({ onCue }: { onCue?: (kind: 'tick') => void }) {
               {nodes.map((n, i) => {
                 const isFresh = fresh.current.has(n.id)
                 const at = 0.1 + (i / Math.max(nodes.length, 4)) * 0.6
-                const show = isFresh ? '1' : seg(at, at + 0.1)
+                const show = compact ? 1 : isFresh ? '1' : seg(at, at + 0.1)
                 return (
                   <g key={n.id} style={{ opacity: show }}>
                     <circle
@@ -210,7 +212,7 @@ export function Wishes({ onCue }: { onCue?: (kind: 'tick') => void }) {
                       fill={n.color}
                       stroke="#2B4FE0"
                       strokeWidth="1.6"
-                      className="anim-float"
+                      className={compact ? '' : 'anim-float'}
                       style={{ animationDelay: `${-(i % 5) * 1.3}s`, transformBox: 'fill-box', transformOrigin: 'center' }}
                     />
                     <text

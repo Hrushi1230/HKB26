@@ -1,7 +1,7 @@
 'use client'
 
 import type { CSSProperties } from 'react'
-import { seg, useScene } from '@/lib/scroll'
+import { seg, useMatchMedia, useScene } from '@/lib/scroll'
 
 const SQUIGGLE =
   'M -30 610 C 170 612 196 546 300 522 C 384 503 398 574 326 580 C 262 585 274 518 404 502 C 706 464 902 522 1104 470 C 1408 392 1506 482 1712 428 C 1812 402 1898 418 1960 396'
@@ -25,17 +25,19 @@ function Enter({
 }
 
 export function Hero() {
-  const ref = useScene<HTMLElement>()
+  const isMobile = useMatchMedia('(max-width: 767px)')
+  // Disable scroll-driven scrubbing on mobile to prevent scrolling lag
+  const ref = useScene<HTMLElement>({ disabled: isMobile })
 
-  const drift = seg(0, 0.78)
-  const out = seg(0.8, 1)
+  const drift = isMobile ? 0 : seg(0, 0.78)
+  const out = isMobile ? 0 : seg(0.8, 1)
 
   return (
     <section
       id="hero"
       ref={ref}
-      className="scene h-[240vh]"
-      style={{ '--static-p': 0 } as CSSProperties}
+      className={`scene ${isMobile ? 'h-[100svh]' : 'h-[240vh]'}`}
+      style={{ '--static-p': 0, '--drift': 0, '--out': 0 } as CSSProperties}
       aria-label="Chapter one — twenty-six"
     >
       <div className="scene-pin">
@@ -45,7 +47,7 @@ export function Hero() {
             {
               '--drift': drift,
               '--out': out,
-              opacity: 'calc(1 - var(--out) * 0.92)',
+              opacity: isMobile ? 1 : 'calc(1 - var(--out) * 0.92)',
             } as CSSProperties
           }
         >
@@ -56,7 +58,7 @@ export function Hero() {
             className="absolute inset-0 h-full w-full"
             fill="none"
             aria-hidden="true"
-            style={{ transform: 'translateY(calc(var(--drift) * -5vh))' }}
+            style={{ transform: isMobile ? 'none' : 'translateY(calc(var(--drift) * -5vh))' }}
           >
             <path
               d={SQUIGGLE}
@@ -71,7 +73,7 @@ export function Hero() {
           {/* floating props */}
           <div className="absolute left-[6%] top-[24%] md:left-[13%] md:top-[28%]" aria-hidden="true">
             <Enter delay={260} className="anim-pop">
-              <div style={{ transform: 'translateY(calc(var(--drift) * -12vh))' }}>
+              <div style={{ transform: isMobile ? 'none' : 'translateY(calc(var(--drift) * -12vh))' }}>
                 <div className="anim-float" style={{ animationDelay: '-1.2s' }}>
                   <svg width="150" height="132" viewBox="0 0 150 132" fill="none">
                     <g transform="rotate(-16 75 66)">
@@ -86,7 +88,7 @@ export function Hero() {
 
           <div className="absolute right-[8%] top-[15%] md:right-[15%] md:top-[17%]" aria-hidden="true">
             <Enter delay={420} className="anim-pop">
-              <div style={{ transform: 'translateY(calc(var(--drift) * -17vh)) rotate(-22deg)' }}>
+              <div style={{ transform: isMobile ? 'rotate(-22deg)' : 'translateY(calc(var(--drift) * -17vh)) rotate(-22deg)' }}>
                 <div className="anim-float" style={{ animationDelay: '-3.4s' }}>
                   <div className="h-[18px] w-[130px] border-b-[7px] border-b-[#4FBF8B] bg-mint md:h-[22px] md:w-[172px]" />
                 </div>
@@ -96,7 +98,7 @@ export function Hero() {
 
           <div className="absolute right-[10%] top-[56%] md:right-[9%] md:top-[54%]" aria-hidden="true">
             <Enter delay={560} className="anim-pop">
-              <div style={{ transform: 'translateY(calc(var(--drift) * -8vh))' }}>
+              <div style={{ transform: isMobile ? 'none' : 'translateY(calc(var(--drift) * -8vh))' }}>
                 <div className="anim-float" style={{ animationDelay: '-2.1s' }}>
                   <svg width="86" height="86" viewBox="0 0 86 86" fill="none">
                     <circle cx="46" cy="46" r="34" fill="#E05334" />
@@ -114,10 +116,14 @@ export function Hero() {
           >
             <Enter delay={120} className="anim-pop">
               <div
-                style={{
-                  transform:
-                    'translateY(calc(var(--drift) * -9vh)) scale(calc(1 + var(--drift) * 0.06))',
-                }}
+                style={
+                  isMobile
+                    ? undefined
+                    : {
+                        transform:
+                          'translateY(calc(var(--drift) * -9vh)) scale(calc(1 + var(--drift) * 0.06))',
+                      }
+                }
               >
                 <div className="relative">
                   <div className="absolute left-1/2 top-full h-[3.5vw] w-[80%] -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-paper-deep" />
@@ -158,10 +164,14 @@ export function Hero() {
 
           <p
             className="await-ready anim-fade label absolute bottom-8 right-6 md:right-20"
-            style={{
-              animationDelay: '1100ms',
-              opacity: `calc(1 - ${seg(0, 0.12)})`,
-            }}
+            style={
+              isMobile
+                ? { animationDelay: '1100ms', opacity: 1 }
+                : {
+                    animationDelay: '1100ms',
+                    opacity: `calc(1 - ${seg(0, 0.12)})`,
+                  }
+            }
           >
             Scroll
           </p>

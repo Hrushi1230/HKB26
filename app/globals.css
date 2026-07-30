@@ -303,6 +303,12 @@ html.lenis body {
   .anim-float {
     animation-duration: 7.5s;
   }
+
+  /* Disable hero section scroll drift on mobile for smooth scrolling performance */
+  #hero {
+    --drift: 0 !important;
+    --out: 0 !important;
+  }
 }
 
 @media (max-height: 700px) and (max-width: 767px) {
